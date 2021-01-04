@@ -38,7 +38,7 @@
                     <option value="2021">2021</option>
                 </select>
             
-            <button type="submit" name="editYear">Année</button>
+            <button type="submit" name="editYear">Changer d'année </button>
 
             <table border="1" align="center" style="margin-top: 30px;">
             <?php
