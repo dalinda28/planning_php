@@ -1,19 +1,27 @@
 <?php
+        $username = $_POST["username"];
+
         //Database connection
         $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
         try {
-            $query = new MongoDB\Driver\Query([]); // getting the collection from Planning database
-            $result = $manager->executeQuery("Planning.Users",$query);
-            $result = $result->toArray();
-        } catch (MongoDB\Driver\Exception\Exception $e) {
+            //Find an account with the $username
+            $filter = ['username' => $username];
+            $option = [];
+            $read = new MongoDB\Driver\Query($filter, $option);
+            $cursor = $manager->executeQuery('Planning.Users', $read);
+            $cursor = $cursor->toArray();
+        } 
+        catch (MongoDB\Driver\Exception\Exception $e) {
             echo "Probleme! : " . $e->getMessage();
             exit();
         }
-        echo "<pre>";
+        echo $username;
         
-        foreach ($result as $Users) {
-            var_dump($Users);
-        }
+        foreach ( $cursor as $id => $value )
+            {
+                echo "$id: ";
+                var_dump( $value );
+            }
         echo "</pre>";
 ?>
 
@@ -53,43 +61,8 @@
         <div align="center">
             <h3>Statistiques par ordre croissant</h3>
             <?php
-            // stats ordering system
-            $usersStatsBis = array(
-                "dadoucha" => $statDalinda,
-                "melou" => $statmel,
-            );
             
-            asort($usersStatsBis);
-            foreach($usersStatsBis as $i=>$userStats){
-                echo $i." : ".$userStats."<br>";
-            }
-        ?>
-
-        <?php
-            $userName = $_POST['username'];
-            $userPass = $_POST['password'];
-    
-            $user = $db->$collection->findOne(array('_id' => '5ff334baa626a0441d509a15',
-                                                    'name'=>'dada' , 
-                                                    'firstname'=>'dadou',
-                                                    'username'=> 'dadoucha', 
-                                                    'password'=> 'dada'));
-    
-            foreach ($user as $obj) {
-                echo 'Username' . $obj['username'];
-                echo 'password: ' . $obj['password'];
-                if($userName == 'dadoucha' && $userPass == 'dada'){
-                    echo 'found'  ;          
-                }
-                else{
-                    echo 'not found'     ;       
-                }
-    
-            }
-        ?>
-        </div>
-
-
+            ?>
     </div>
 </body>
 </html>
