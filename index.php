@@ -15,12 +15,10 @@
             echo "Probleme! : " . $e->getMessage();
             exit();
         }
-        echo $username;
-        
-        foreach ( $cursor as $id => $value )
+
+        foreach ( $cursor as $user )
             {
-                echo "$id: ";
-                var_dump( $value );
+                echo $user->_id;
             }
         echo "</pre>";
 ?>
