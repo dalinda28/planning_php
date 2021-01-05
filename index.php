@@ -2,18 +2,24 @@
         //Database connection
         $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
         try {
-            $query = new MongoDB\Driver\Query([]); // getting the collection from Planning database
-            $result = $manager->executeQuery("Planning.Users",$query);
-            $result = $result->toArray();
-        } catch (MongoDB\Driver\Exception\Exception $e) {
+            //Find an account with the $username
+            $filter = ['username' => $username];
+            $option = [];
+            $read = new MongoDB\Driver\Query($filter, $option);
+            $cursor = $manager->executeQuery('Planning.Users', $read);
+            $cursor = $cursor->toArray();
+        } 
+        catch (MongoDB\Driver\Exception\Exception $e) {
             echo "Probleme! : " . $e->getMessage();
             exit();
         }
         echo "<pre>";
         
-        foreach ($result as $Users) {
-            var_dump($Users);
-        }
+        foreach ( $cursor as $id => $value )
+                {
+                    echo "$id: ";
+                    var_dump( $value );
+                }
         echo "</pre>";
 ?>
 
