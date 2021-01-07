@@ -1,26 +1,5 @@
 <?php
-        //Database connection
-        $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
-        try {
-            //Find an account with the $username
-            $filter = ['username' => $username];
-            $option = [];
-            $read = new MongoDB\Driver\Query($filter, $option);
-            $cursor = $manager->executeQuery('Planning.Users', $read);
-            $cursor = $cursor->toArray();
-        } 
-        catch (MongoDB\Driver\Exception\Exception $e) {
-            echo "Probleme! : " . $e->getMessage();
-            exit();
-        }
-        echo "<pre>";
         
-        foreach ( $cursor as $id => $value )
-                {
-                    echo "$id: ";
-                    var_dump( $value );
-                }
-        echo "</pre>";
 ?>
 
 <!DOCTYPE html>
@@ -48,7 +27,72 @@
 
             <table border="1" align="center" style="margin-top: 30px;">
             <?php
-                  
+
+                function firstDayOfWeek($week, $year){
+                $timeStampPremierJanvier = strtotime($year . '-01-01');
+                $jourPremierJanvier = date('w', $timeStampPremierJanvier);
+            
+                //-- recherche du N° de semaine du 1er janvier -------------------
+                $numSemainePremierJanvier = date('W', $timeStampPremierJanvier);
+            
+                //-- nombre à ajouter en fonction du numéro précédent ------------
+                $decallage = ($numSemainePremierJanvier == 1) ? $week - 1 : $week;
+                //-- timestamp du jour dans la semaine recherchée ----------------
+                $timeStampDate = strtotime('+' . $decallage . ' weeks', $timeStampPremierJanvier);
+                //-- recherche du lundi de la semaine en fonction de la ligne précédente ---------
+                $jourDebutSemaine = ($jourPremierJanvier == 1) ? date('d-m-Y', $timeStampDate) : date('d-m-Y', strtotime('last monday', $timeStampDate));
+                
+                return $jourDebutSemaine;
+            }
+
+            //On va remplir un tableau contenant tous les utilisateurs
+            $users_array = [];
+            //Database connection
+            $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
+            try {
+                //Find an account with the $username
+                $filter = [];
+                $option = [];
+                $read = new MongoDB\Driver\Query($filter, $option);
+                $cursor = $manager->executeQuery('Planning.Users', $read);
+            } 
+            catch (MongoDB\Driver\Exception\Exception $e) {
+                echo "Probleme! : " . $e->getMessage();
+                exit();
+            }
+            foreach ($cursor as $user) {
+                $users_array[]= $user->username;
+            }
+            
+            $year=2021;
+            $week=0;
+            
+            for ($i = 1; $i <= 13; $i++) {
+                echo "
+                <tr>
+                ";
+                for ($j = 1; $j <= 4; $j++) {
+                    $week = $week+1;
+                    echo 
+                    "
+                    <td>";
+                    echo firstDayOfWeek($week, $year);
+                    echo "</td>
+                    <td> 
+                        <select>"; 
+                        foreach ($users_array as $user){
+                            echo "<option>$user</option>";
+                        }
+                        echo "<option selected='selected'>personne</option>";
+                    echo "</select>
+                    </td>
+                    ";
+                }
+                echo "
+                </tr>
+                ";          
+            }
+            
             ?>
             </table>
 
@@ -72,8 +116,29 @@
         ?>
 
         <?php
-            $userName = $_POST['username'];
+            $username = $_POST['username'];
             $userPass = $_POST['password'];
+
+            try {
+                //Find an account with the $username
+                $filter = ['username' => $username];
+                $option = [];
+                $read = new MongoDB\Driver\Query($filter, $option);
+                $cursor = $manager->executeQuery('Planning.Users', $read);
+                $cursor = $cursor->toArray();
+            } 
+            catch (MongoDB\Driver\Exception\Exception $e) {
+                echo "Probleme! : " . $e->getMessage();
+                exit();
+            }
+            echo "<pre>";
+            echo "hello";
+            foreach ($cursor as $id => $value)
+                    {
+                        echo $id;
+                        var_dump( $value );
+                    }
+            echo "</pre>";
     
             $user = $db->$collection->findOne(array('_id' => '5ff334baa626a0441d509a15',
                                                     'name'=>'dada' , 
