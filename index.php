@@ -3,7 +3,6 @@
     if (isset($_SESSION['login'])) {
         header('Location: connexion.php');
     }
-        
 ?>
 
 <!DOCTYPE html>
@@ -16,11 +15,11 @@
 </head>
 <body>
         <?php
-        if($_SESSION['username'] !== ""){
-            $username = $_SESSION['username'];
-            // afficher un message
-            echo "Bonjour $username, vous êtes connecté";
-        }
+            $_SESSION['username']=$_POST['username']  ;
+            echo 'Vous êtes connecté en tant que : ';
+            echo $_SESSION['username'];
+
+
         ?>
     <div class="container">
         <div>
@@ -40,20 +39,20 @@
             <?php
 
                 function firstDayOfWeek($week, $year){
-                $timeStampPremierJanvier = strtotime($year . '-01-01');
-                $jourPremierJanvier = date('w', $timeStampPremierJanvier);
-            
-                //-- recherche du N° de semaine du 1er janvier -------------------
-                $numSemainePremierJanvier = date('W', $timeStampPremierJanvier);
-            
-                //-- nombre à ajouter en fonction du numéro précédent ------------
-                $decallage = ($numSemainePremierJanvier == 1) ? $week - 1 : $week;
-                //-- timestamp du jour dans la semaine recherchée ----------------
-                $timeStampDate = strtotime('+' . $decallage . ' weeks', $timeStampPremierJanvier);
-                //-- recherche du lundi de la semaine en fonction de la ligne précédente ---------
-                $jourDebutSemaine = ($jourPremierJanvier == 1) ? date('d-m-Y', $timeStampDate) : date('d-m-Y', strtotime('last monday', $timeStampDate));
+                    $timeStampPremierJanvier = strtotime($year . '-01-01');
+                    $jourPremierJanvier = date('w', $timeStampPremierJanvier);
                 
-                return $jourDebutSemaine;
+                    //-- recherche du N° de semaine du 1er janvier -------------------
+                    $numSemainePremierJanvier = date('W', $timeStampPremierJanvier);
+                
+                    //-- nombre à ajouter en fonction du numéro précédent ------------
+                    $decallage = ($numSemainePremierJanvier == 1) ? $week - 1 : $week;
+                    //-- timestamp du jour dans la semaine recherchée ----------------
+                    $timeStampDate = strtotime('+' . $decallage . ' weeks', $timeStampPremierJanvier);
+                    //-- recherche du lundi de la semaine en fonction de la ligne précédente ---------
+                    $jourDebutSemaine = ($jourPremierJanvier == 1) ? date('d-m-Y', $timeStampDate) : date('d-m-Y', strtotime('last monday', $timeStampDate));
+                    
+                    return $jourDebutSemaine;
             }
 
             //On va remplir un tableau contenant tous les utilisateurs

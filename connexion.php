@@ -1,6 +1,6 @@
 <?php
     session_start();
-    if(isset($_POST['login'])){
+     if (isset($_POST['username']) and isset($_POST['password'])){
         // on applique les deux fonctions mysqli_real_escape_string et htmlspecialchars
         // pour éliminer toute attaque de type injection SQL et XSS
         $username = mysqli_real_escape_string($db,htmlspecialchars($_POST['username'])); 
@@ -20,17 +20,14 @@
             exit();
         }
    
-        $users_array = [];
+        $currUser=[];
         foreach ($cursor as $user) {
-            $users_array[]= $user->username;
+            $userExist = $user ? true : false;
+            $currUser=$user;
         }
 
-        foreach ($users_array as $user){
-            $userExist == $user ? true : false;
-            $users_array=$user;
-        }
         if (!$userExist) {
-            $res = "Ce username n'existe pas";
+            $res1 = "Ce username n'existe pas";
         }  
         else {
             $password_hashed = $currUser->password;
