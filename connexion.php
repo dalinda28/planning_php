@@ -9,7 +9,7 @@
         // connexion à la base de données
         $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
         try {
-            //Find an account with the $username
+            
             $filter = [];
             $option = [];
             $read = new MongoDB\Driver\Query($filter, $option);
