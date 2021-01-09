@@ -1,27 +1,9 @@
 <?php
-       /* $username = $_POST["username"];
-
-        //Database connection
-        $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
-        try {
-            //Find an account with the $username
-            $filter = ['username' => $username];
-            $option = [];
-            $read = new MongoDB\Driver\Query($filter, $option);
-            $cursor = $manager->executeQuery('Planning.Users', $read);
-            $cursor = $cursor->toArray();
-        } 
-        catch (MongoDB\Driver\Exception\Exception $e) {
-            echo "Probleme! : " . $e->getMessage();
-            exit();
-        }
-
-        foreach ( $cursor as $user )
-            {
-                echo $user->_id;
-            }
-
-        echo "</pre>";*/
+    session_start();
+    if (isset($_SESSION['login'])) {
+        header('Location: connexion.php');
+    }
+        
 ?>
 
 <!DOCTYPE html>
@@ -33,6 +15,13 @@
     <title>Planning MongoDB Mel & Dadou</title>
 </head>
 <body>
+        <?php
+        if($_SESSION['username'] !== ""){
+            $username = $_SESSION['username'];
+            // afficher un message
+            echo "Bonjour $username, vous êtes connecté";
+        }
+        ?>
     <div class="container">
         <div>
             <h1 align="center">Planning des corvées  d'épluchage</h1>
@@ -124,6 +113,12 @@
 
         <div align="center">
             <h3>Statistiques par ordre croissant</h3>
+            <?php
+                foreach ($users_array as $user){
+                    echo "<option>$user</option>";
+                }
+            ?>
+
             
 
         </div>
