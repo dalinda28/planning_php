@@ -1,4 +1,8 @@
 <?php
+/*session_start();
+if (isset($_SESSION['login'])) {
+    header('Location: connexion.php');
+}*/
 
 //Database connection
 $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
@@ -34,7 +38,6 @@ if (isset($_POST["updateTable"])) {
         }
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -46,6 +49,13 @@ if (isset($_POST["updateTable"])) {
     <title>Planning MongoDB Mel & Dadou</title>
 </head>
 <body>
+        <?php
+            $_SESSION['username']=$_POST['username']  ;
+            echo 'Vous êtes connecté en tant que : ';
+            echo $_SESSION['username'];
+
+
+        ?>
     <div class="container">
         <div>
             <h1 align="center">Planning des corvées d'épluchage</h1>
@@ -77,7 +87,14 @@ if (isset($_POST["updateTable"])) {
                 //Recherche du lundi de la semaine en fonction de la ligne précédente
                 $jourDebutSemaine = ($jourPremierJanvier == 1) ? date('d-m-Y', $timeStampDate) : date('d-m-Y', strtotime('last monday', $timeStampDate));
                 
-                return $jourDebutSemaine;
+                    //-- nombre à ajouter en fonction du numéro précédent ------------
+                    $decallage = ($numSemainePremierJanvier == 1) ? $week - 1 : $week;
+                    //-- timestamp du jour dans la semaine recherchée ----------------
+                    $timeStampDate = strtotime('+' . $decallage . ' weeks', $timeStampPremierJanvier);
+                    //-- recherche du lundi de la semaine en fonction de la ligne précédente ---------
+                    $jourDebutSemaine = ($jourPremierJanvier == 1) ? date('d-m-Y', $timeStampDate) : date('d-m-Y', strtotime('last monday', $timeStampDate));
+                    
+                    return $jourDebutSemaine;
             }
 
             //On va remplir un array contenant tous les utilisateurs
@@ -170,6 +187,12 @@ if (isset($_POST["updateTable"])) {
 
         <div align="center">
             <h3>Statistiques par ordre croissant</h3>
+            <?php
+                foreach ($users_array as $user){
+                    echo "<option>$user</option>";
+                }
+            ?>
+
             
 
         </div>
