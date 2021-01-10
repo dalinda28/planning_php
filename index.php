@@ -1,27 +1,40 @@
 <?php
-       /* $username = $_POST["username"];
 
-        //Database connection
-        $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
+//Database connection
+$manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
+
+//Si la page a été chargée après un changement d'année via le select: $currYear désigne l'année que le planning va afficher
+if (isset($_POST["isFormSend"])){
+    $currYear=(int)$_POST["year"];
+}
+//Par défaut afficher le planning de 2021
+else {
+    $currYear=2021;
+}
+
+//Si la page a été chargée après la validation du planning, on actualise les valeurs de la bdd
+if (isset($_POST["updateTable"])) {
+    $year=(int)$_POST["year"]; 
+    $currYear=$year;
+
+    for ($i = 1; $i <= 52; $i++) {
+        $currUser=$_POST["eplucheur$i"];
         try {
-            //Find an account with the $username
-            $filter = ['username' => $username];
-            $option = [];
-            $read = new MongoDB\Driver\Query($filter, $option);
-            $cursor = $manager->executeQuery('Planning.Users', $read);
-            $cursor = $cursor->toArray();
-        } 
-        catch (MongoDB\Driver\Exception\Exception $e) {
-            echo "Probleme! : " . $e->getMessage();
-            exit();
+            // update
+            $updates = new MongoDB\Driver\BulkWrite();
+            $updates->update(
+                        ['year' => $year, 'week' => $i],
+                        ['$set' => ['user' => $currUser]],
+                        ['multi' => true, 'upsert' => true]
+                        );
+            $result = $manager->executeBulkWrite('Planning.Weeks', $updates);   
+
+        } catch (MongoDB\Driver\Exception\BulkWriteException $e) {
+            echo $e->getMessage();
         }
+    }
+}
 
-        foreach ( $cursor as $user )
-            {
-                echo $user->_id;
-            }
-
-        echo "</pre>";*/
 ?>
 
 <!DOCTYPE html>
@@ -35,77 +48,110 @@
 <body>
     <div class="container">
         <div>
-            <h1 align="center">Planning des corvées  d'épluchage</h1>
+            <h1 align="center">Planning des corvées d'épluchage</h1>
         </div>
-        <form action="" method="post" align="center">
+        <form action="" name="form_year" method="post" align="center"> 
             <label for="year">Année :</label>
-                <select name="year">
-                    <option value="2019">2019</option>
-                    <option value="2020">2020</option>
-                    <option value="2021">2021</option>
-                </select>
-            
-            <button type="submit" name="editYear">Changer d'année </button>
-
+            <select id="selectYear" name="year">
+                <option value="2019" name="year"<?php if ($currYear==2019):?> selected="selected" <?php endif;?>>2019</option>
+                <option value="2020" name="year"<?php if ($currYear==2020):?> selected="selected" <?php endif;?>>2020</option>
+                <option value="2021" name="year"<?php if ($currYear==2021):?> selected="selected" <?php endif;?>>2021</option>
+            </select>
+            <input type="hidden" name="isFormSend" value="">
+        </form>
+        <form action="" method="post" align="center">
+            <input type="hidden" id="currYear" name="year" value="<?php echo $currYear?>">
             <table border="1" align="center" style="margin-top: 30px;">
             <?php
-
                 function firstDayOfWeek($week, $year){
                 $timeStampPremierJanvier = strtotime($year . '-01-01');
                 $jourPremierJanvier = date('w', $timeStampPremierJanvier);
             
-                //-- recherche du N° de semaine du 1er janvier -------------------
+                //Recherche du N° de semaine du 1er janvier
                 $numSemainePremierJanvier = date('W', $timeStampPremierJanvier);
             
-                //-- nombre à ajouter en fonction du numéro précédent ------------
+                //Nombre à ajouter en fonction du numéro précédent
                 $decallage = ($numSemainePremierJanvier == 1) ? $week - 1 : $week;
-                //-- timestamp du jour dans la semaine recherchée ----------------
+                //Timestamp du jour dans la semaine recherchée
                 $timeStampDate = strtotime('+' . $decallage . ' weeks', $timeStampPremierJanvier);
-                //-- recherche du lundi de la semaine en fonction de la ligne précédente ---------
+                //Recherche du lundi de la semaine en fonction de la ligne précédente
                 $jourDebutSemaine = ($jourPremierJanvier == 1) ? date('d-m-Y', $timeStampDate) : date('d-m-Y', strtotime('last monday', $timeStampDate));
                 
                 return $jourDebutSemaine;
             }
 
-            //On va remplir un tableau contenant tous les utilisateurs
-            $users_array = [];
-            //Database connection
-            $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
-            try {
-                //Find an account with the $username
-                $filter = [];
-                $option = [];
-                $read = new MongoDB\Driver\Query($filter, $option);
-                $cursor = $manager->executeQuery('Planning.Users', $read);
-            } 
-            catch (MongoDB\Driver\Exception\Exception $e) {
-                echo "Probleme! : " . $e->getMessage();
-                exit();
+            //On va remplir un array contenant tous les utilisateurs
+            $users_array = getAllUsers();
+
+            function getAllUsers(){
+                $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
+                try {
+                    $filter = [];
+                    $option = [];
+                    $read = new MongoDB\Driver\Query($filter, $option);
+                    $cursor1 = $manager->executeQuery('Planning.Users', $read);
+                } 
+                catch (MongoDB\Driver\Exception\Exception $e) {
+                    echo "Probleme! : " . $e->getMessage();
+                    exit();
+                }
+                foreach ($cursor1 as $user) {
+                    $users_array[]= $user->username;
+                }
+                return $users_array;
             }
-            foreach ($cursor as $user) {
-                $users_array[]= $user->username;
-            }
+
+            //On prélève toutes les infos de l'année sélectionnée (semaine=>éplucheur) et on les stocke dans un array
+            $date_array=getData($currYear);       
             
-            $year=2021;
+            function getData($year){
+                $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
+                try {
+                    $filter = ["year" => $year];
+                    $option = [];
+                    $read = new MongoDB\Driver\Query($filter, $option);
+                    $cursor2 = $manager->executeQuery('Planning.Weeks', $read);
+                } 
+                catch (MongoDB\Driver\Exception\Exception $e) {
+                    echo "Probleme! : " . $e->getMessage();
+                    exit();
+                }
+
+                foreach ($cursor2 as $date) {
+                    $date_array[$date->week] = $date->user;
+                }
+                return $date_array;
+            }
+
             $week=0;
-            
+
+            //On construit le tableau (planning) avec ses cellules
             for ($i = 1; $i <= 13; $i++) {
                 echo "
                 <tr>
-                ";
+                ";        
                 for ($j = 1; $j <= 4; $j++) {
                     $week = $week+1;
                     echo 
                     "
                     <td>";
-                    echo firstDayOfWeek($week, $year);
-                    echo "</td>
+                    echo firstDayOfWeek($week, $currYear);
+                    echo "
+                    </td>
                     <td> 
-                        <select>"; 
+                        <select name='eplucheur".$week."'>"; 
+              
+                        $currUser = $date_array[$week];
+                        echo "<option selected ='selected' value='personne' name='eplucheur".$week."'>personne</option>";
+
                         foreach ($users_array as $user){
-                            echo "<option>$user</option>";
+                            echo "<option ";
+                            if ($user == $currUser){
+                                echo "selected ='selected' ";
+                            }
+                            echo "value='$user' name='eplucheur".$week."'>$user</option>";
                         }
-                        echo "<option selected='selected'>personne</option>";
+                        
                     echo "</select>
                     </td>
                     ";
@@ -131,4 +177,22 @@
 
     </div>
 </body>
+<script>
+    window.addEventListener("load", changeYear);
+
+    document.getElementById("selectYear").addEventListener("change", reload);
+
+    function changeYear(){
+        select = document.getElementById("selectYear");
+		choice = select.selectedIndex;
+        elmtSelected = select.options[choice].value;
+        
+        currYear = document.getElementById("currYear");
+        currYear.value = elmtSelected;   
+    }
+
+    function reload(){
+        document.forms['form_year'].submit();
+    }
+</script>
 </html>
