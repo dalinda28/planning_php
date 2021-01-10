@@ -5,12 +5,13 @@
         // pour éliminer toute attaque de type injection SQL et XSS
         $username = mysqli_real_escape_string($db,htmlspecialchars($_POST['username'])); 
         $password = mysqli_real_escape_string($db,htmlspecialchars($_POST['password']));
+        $username=$_POST['username'];
+        $password=$_POST['password'];
         
         // connexion à la base de données
         $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
-        try {
-            
-            $filter = [];
+        try {      
+            $filter = ['username' => $username, 'password' => $password];
             $option = [];
             $read = new MongoDB\Driver\Query($filter, $option);
             $cursor = $manager->executeQuery('Planning.Users', $read);
@@ -20,7 +21,6 @@
             exit();
         }
    
-        $currUser=[];
         foreach ($cursor as $user) {
             $userExist = $user ? true : false;
             $currUser=$user;
@@ -29,15 +29,17 @@
         if (!$userExist) {
             $res1 = "Ce username n'existe pas";
         }  
+
         else {
             $password_hashed = $currUser->password;
             if (!password_verify($password, $password_hashed)) {
-                $res = "Mot de passe incorrect";
+                $res2 = "Mot de passe incorrect";
             }
             else {
                 $_SESSION["id"] = $currUser->_id;
-                $_SESSION["username"] = $currUser->username;    
-                header('Location: index.php');
+                $_SESSION["username"] = $currUser->username;     
+
+                header('Location: index.php');       
                 die();
             }
         }
@@ -55,14 +57,16 @@
     </head>
     <body>
         <div id="container">
-            <form action="index.php" method="POST">
+            <form action="" method="POST">
                 <h1>Connexion</h1>
 
                 <label><b>Nom d'utilisateur</b></label>
                 <input type="text" placeholder="Entrer le nom d'utilisateur" name="username" required>
+                <?php echo "<span>$res1</span><br>"; ?>
 
                 <label><b>Mot de passe</b></label>
                 <input type="password" placeholder="Entrer le mot de passe" name="password" required>
+                <?php echo "<span>$res2</span>"; ?>
 
                 <input type="submit" id='submit' value='LOGIN'>
             </form>

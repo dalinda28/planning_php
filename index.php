@@ -49,13 +49,12 @@ if (isset($_POST["updateTable"])) {
     <title>Planning MongoDB Mel & Dadou</title>
 </head>
 <body>
-        <?php
-            $_SESSION['username']=$_POST['username']  ;
-            echo 'Vous êtes connecté en tant que : ';
-            echo $_SESSION['username'];
+    <?php
+    /*$_SESSION['username']=$_POST['username']  ;
+    echo 'Vous êtes connecté en tant que : ';
+    echo $_SESSION['username'];*/
+    ?>
 
-
-        ?>
     <div class="container">
         <div>
             <h1 align="center">Planning des corvées d'épluchage</h1>
