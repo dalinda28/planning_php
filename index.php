@@ -48,6 +48,22 @@ if (isset($_POST["updateTable"])) {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Planning MongoDB Mel & Dadou</title>
 </head>
+<style>
+
+.Melinna {
+	background-color: #FF9900;
+}
+
+.Dalinda {
+	background-color: #00CCFF;
+}
+.Jean {
+	background-color: #00FF33;
+}
+.Youssef {
+	background-color: #FFFF00;
+}
+</style>
 <body>
     <?php
     /*$_SESSION['username']=$_POST['username']  ;
@@ -140,7 +156,11 @@ if (isset($_POST["updateTable"])) {
             }
 
             $week=0;
-
+            // stats by user
+            $statMelinna = 0;
+            $statYoussef = 0;
+            $statDalinda = 0;
+            $statJean = 0;
             //On construit le tableau (planning) avec ses cellules
             for ($i = 1; $i <= 13; $i++) {
                 echo "
@@ -148,26 +168,42 @@ if (isset($_POST["updateTable"])) {
                 ";        
                 for ($j = 1; $j <= 4; $j++) {
                     $week = $week+1;
-                    echo 
-                    "
+                    echo "
                     <td>";
                     echo firstDayOfWeek($week, $currYear);
+                    $currUser = $date_array[$week];
                     echo "
                     </td>
                     <td> 
-                        <select name='eplucheur".$week."'>"; 
-              
-                        $currUser = $date_array[$week];
+                        <select class=$currUser name='eplucheur".$week."'>";
+                        
                         echo "<option selected ='selected' value='personne' name='eplucheur".$week."'>personne</option>";
 
                         foreach ($users_array as $user){
                             echo "<option ";
                             if ($user == $currUser){
-                                echo "selected ='selected' ";
+                                echo "selected ='selected'";
+                                //pour les statistiques
+                                switch ($user) {
+                                    case 'Melinna':
+                                        $statMelinna++;
+                                        $number = 1;
+                                        echo "class='user".$number."'";
+                                        break;
+                                    case 'Dalinda':
+                                        $statDalinda++;
+                                        $number = 2;
+                                        break;
+                                    case 'Jean':
+                                        $statJean++;
+                                        break;
+                                    case 'Youssef':
+                                        $statYoussef++;
+                                        break;
+                                }
                             }
                             echo "value='$user' name='eplucheur".$week."'>$user</option>";
                         }
-                        
                     echo "</select>
                     </td>
                     ";
@@ -187,9 +223,22 @@ if (isset($_POST["updateTable"])) {
         <div align="center">
             <h3>Statistiques par ordre croissant</h3>
             <?php
-                foreach ($users_array as $user){
-                    echo "<option>$user</option>";
+                // stats ordering system
+                $usersStats = array(
+                    "Melinna" => $statMelinna,
+                    "Dalinda" => $statDalinda,
+                    "Jean" => $statJean,
+                    "Youssef" => $statYoussef
+                );
+                asort($usersStats);
+                foreach($usersStats as $i=>$usersStat){
+                    echo $i." : ".$usersStat."<br>";
                 }
+/*
+                foreach ($users_array as $user){
+                    echo "<option>$user : $statMelinna </option>" ;
+                }
+*/
             ?>
 
             
@@ -202,6 +251,7 @@ if (isset($_POST["updateTable"])) {
 <script>
     window.addEventListener("load", changeYear);
 
+    
     document.getElementById("selectYear").addEventListener("change", reload);
 
     function changeYear(){
@@ -216,5 +266,6 @@ if (isset($_POST["updateTable"])) {
     function reload(){
         document.forms['form_year'].submit();
     }
+});
 </script>
 </html>
