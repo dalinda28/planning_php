@@ -3,8 +3,6 @@
      if (isset($_POST['username']) and isset($_POST['password'])){
         // on applique les deux fonctions mysqli_real_escape_string et htmlspecialchars
         // pour éliminer toute attaque de type injection SQL et XSS
-        $username = mysqli_real_escape_string($db,htmlspecialchars($_POST['username'])); 
-        $password = mysqli_real_escape_string($db,htmlspecialchars($_POST['password']));
         $username=$_POST['username'];
         $password=$_POST['password'];
         
@@ -69,6 +67,11 @@
                 <?php echo "<span>$res2</span>"; ?>
 
                 <input type="submit" id='submit' value='LOGIN'>
+                <?php  
+                    if (!$userExist) {
+                        $res1 = "Ce username n'existe pas";
+                    }  
+                ?> 
             </form>
         </div>
     </body>
