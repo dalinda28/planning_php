@@ -87,28 +87,12 @@ if (isset($_POST["updateTable"])) {
         <form action="" method="post" align="center">
             <input type="hidden" id="currYear" name="year" value="<?php echo $currYear?>">
             <table border="1" align="center" style="margin-top: 30px;">
-            <?php
-                function firstDayOfWeek($week, $year){
-                $timeStampPremierJanvier = strtotime($year . '-01-01');
-                $jourPremierJanvier = date('w', $timeStampPremierJanvier);
-            
-                //Recherche du N° de semaine du 1er janvier
-                $numSemainePremierJanvier = date('W', $timeStampPremierJanvier);
-            
-                //Nombre à ajouter en fonction du numéro précédent
-                $decallage = ($numSemainePremierJanvier == 1) ? $week - 1 : $week;
-                //Timestamp du jour dans la semaine recherchée
-                $timeStampDate = strtotime('+' . $decallage . ' weeks', $timeStampPremierJanvier);
-                //Recherche du lundi de la semaine en fonction de la ligne précédente
-                $jourDebutSemaine = ($jourPremierJanvier == 1) ? date('d-m-Y', $timeStampDate) : date('d-m-Y', strtotime('last monday', $timeStampDate));
-                
-                    //-- nombre à ajouter en fonction du numéro précédent ------------
-                    $decallage = ($numSemainePremierJanvier == 1) ? $week - 1 : $week;
-                    //-- timestamp du jour dans la semaine recherchée ----------------
-                    $timeStampDate = strtotime('+' . $decallage . ' weeks', $timeStampPremierJanvier);
-                    //-- recherche du lundi de la semaine en fonction de la ligne précédente ---------
-                    $jourDebutSemaine = ($jourPremierJanvier == 1) ? date('d-m-Y', $timeStampDate) : date('d-m-Y', strtotime('last monday', $timeStampDate));
+                <?php
+                    function firstDayOfWeek($week, $year){
+                        $timeStampPremierJanvier = strtotime($year . '-01-01');
+                        $jourPremierJanvier = date('w', $timeStampPremierJanvier);
                     
+<<<<<<< Updated upstream
                     return $jourDebutSemaine;
             }
 
@@ -214,10 +198,115 @@ if (isset($_POST["updateTable"])) {
             }
             
             ?>
+=======
+                        //Recherche du N° de semaine du 1er janvier
+                        $numSemainePremierJanvier = date('W', $timeStampPremierJanvier);
+                    
+                        //Nombre à ajouter en fonction du numéro précédent
+                        $decallage = ($numSemainePremierJanvier == 1) ? $week - 1 : $week;
+                        //Timestamp du jour dans la semaine recherchée
+                        $timeStampDate = strtotime('+' . $decallage . ' weeks', $timeStampPremierJanvier);
+                        //Recherche du lundi de la semaine en fonction de la ligne précédente
+                        $jourDebutSemaine = ($jourPremierJanvier == 1) ? date('d-m-Y', $timeStampDate) : date('d-m-Y', strtotime('last monday', $timeStampDate));
+                    
+                        //-- nombre à ajouter en fonction du numéro précédent ------------
+                        $decallage = ($numSemainePremierJanvier == 1) ? $week - 1 : $week;
+                        //-- timestamp du jour dans la semaine recherchée ----------------
+                        $timeStampDate = strtotime('+' . $decallage . ' weeks', $timeStampPremierJanvier);
+                        //-- recherche du lundi de la semaine en fonction de la ligne précédente ---------
+                        $jourDebutSemaine = ($jourPremierJanvier == 1) ? date('d-m-Y', $timeStampDate) : date('d-m-Y', strtotime('last monday', $timeStampDate));
+                        
+                        return $jourDebutSemaine;
+                    }
+
+                    //On va remplir un array contenant tous les utilisateurs
+                    $users_array = getAllUsers();
+
+                    function getAllUsers(){
+                        $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
+                        try {
+                            $filter = [];
+                            $option = [];
+                            $read = new MongoDB\Driver\Query($filter, $option);
+                            $cursor1 = $manager->executeQuery('Planning.Users', $read);
+                        } 
+                        catch (MongoDB\Driver\Exception\Exception $e) {
+                            echo "Probleme! : " . $e->getMessage();
+                            exit();
+                        }
+                        foreach ($cursor1 as $user) {
+                            $users_array[]= $user->username;
+                        }
+                        return $users_array;
+                    }
+
+                    //On prélève toutes les infos de l'année sélectionnée (semaine=>éplucheur) et on les stocke dans un array
+                    $date_array=getData($currYear);       
+                    
+                    function getData($year){
+                        $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
+                        try {
+                            $filter = ["year" => $year];
+                            $option = [];
+                            $read = new MongoDB\Driver\Query($filter, $option);
+                            $cursor2 = $manager->executeQuery('Planning.Weeks', $read);
+                        } 
+                        catch (MongoDB\Driver\Exception\Exception $e) {
+                            echo "Probleme! : " . $e->getMessage();
+                            exit();
+                        }
+
+                        foreach ($cursor2 as $date) {
+                            $date_array[$date->week] = $date->user;
+                        }
+                        return $date_array;
+                    }
+
+                    $week=0;
+
+                    //On construit le tableau (planning) avec ses cellules
+                    for ($i = 1; $i <= 13; $i++) {
+                        echo "
+                        <tr>
+                        ";        
+                        for ($j = 1; $j <= 4; $j++) {
+                            $week = $week+1;
+                            echo 
+                            "
+                            <td>";
+                            echo firstDayOfWeek($week, $currYear);
+                            echo "
+                            </td>
+                            <td> 
+                                <select name='eplucheur".$week."'>"; 
+                    
+                                $currUser = $date_array[$week];
+                                echo "<option selected ='selected' value='personne' name='eplucheur".$week."'>personne</option>";
+
+                                foreach ($users_array as $user){
+                                    echo "<option ";
+                                    if ($user == $currUser){
+                                        echo "selected ='selected' ";
+                                    }
+                                    echo "value='$user' name='eplucheur".$week."'>$user</option>";
+                                }
+                                
+                            echo "</select>
+                            </td>
+                            ";
+                        }
+                        echo "
+                        </tr>
+                        ";          
+                    }
+                    
+                ?>
+>>>>>>> Stashed changes
             </table>
 
             <br>
             <button type="submit" name="updateTable">Valider le planning</button>
+<<<<<<< Updated upstream
         </form>
 
         <div align="center">
@@ -244,8 +333,19 @@ if (isset($_POST["updateTable"])) {
             
 
         </div>
+=======
+>>>>>>> Stashed changes
 
+        </form>
 
+            <div align="center">
+                <h3>Statistiques par ordre croissant</h3>
+                <?php
+                    foreach ($users_array as $user){
+                        echo "<option>$user</option>";
+                    }
+                ?>
+            </div>
     </div>
 </body>
 <script>
