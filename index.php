@@ -49,27 +49,19 @@ if (isset($_POST["updateTable"])) {
     <title>Planning MongoDB Mel & Dadou</title>
 </head>
 <style>
-.user1 {
+
+.Melinna {
 	background-color: #FF9900;
 }
-.user2 {
+
+.Dalinda {
 	background-color: #00CCFF;
 }
-.user3 {
+.Jean {
 	background-color: #00FF33;
 }
-.user4 {
+.Youssef {
 	background-color: #FFFF00;
-}
-.user0{
-	background-color: #FF0000;
-}
-.container {
-	width:950px;
-	margin: 0 auto;
-}
-.annee {
-	text-align:center;
 }
 </style>
 <body>
@@ -175,29 +167,28 @@ if (isset($_POST["updateTable"])) {
                 <tr>
                 ";        
                 for ($j = 1; $j <= 4; $j++) {
-                    $number = 3;
                     $week = $week+1;
-                    echo 
-                    "
+                    echo "
                     <td>";
                     echo firstDayOfWeek($week, $currYear);
+                    $currUser = $date_array[$week];
                     echo "
                     </td>
                     <td> 
-                        <select name='eplucheur".$week."'  > "; // incrementer  le number pour style css
-                        $currUser = $date_array[$week];
-                        echo "<option selected ='selected' value='personne' name='eplucheur".$week."'  >personne</option>";
+                        <select class=$currUser name='eplucheur".$week."'>";
+                        
+                        echo "<option selected ='selected' value='personne' name='eplucheur".$week."'>personne</option>";
 
                         foreach ($users_array as $user){
                             echo "<option ";
                             if ($user == $currUser){
-                                echo "selected ='selected' ";
+                                echo "selected ='selected'";
                                 //pour les statistiques
                                 switch ($user) {
                                     case 'Melinna':
                                         $statMelinna++;
-                                        echo " style='background-color:red'";
                                         $number = 1;
+                                        echo "class='user".$number."'";
                                         break;
                                     case 'Dalinda':
                                         $statDalinda++;
@@ -213,7 +204,6 @@ if (isset($_POST["updateTable"])) {
                             }
                             echo "value='$user' name='eplucheur".$week."'>$user</option>";
                         }
-                        
                     echo "</select>
                     </td>
                     ";
@@ -276,5 +266,6 @@ if (isset($_POST["updateTable"])) {
     function reload(){
         document.forms['form_year'].submit();
     }
+});
 </script>
 </html>
