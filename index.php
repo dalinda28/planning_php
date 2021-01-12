@@ -46,13 +46,14 @@ if (isset($_POST["updateTable"])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="index.css" type="text/css"/>
     <title>Planning MongoDB Mel & Dadou</title>
 </head>
 <body>
     <?php
-    /*$_SESSION['username']=$_POST['username']  ;
+    $_SESSION['username']=$_POST['username']  ;
     echo 'Vous êtes connecté en tant que : ';
-    echo $_SESSION['username'];*/
+    echo $_SESSION['username'];
     ?>
 
     <div class="container">
@@ -152,12 +153,12 @@ if (isset($_POST["updateTable"])) {
                     "
                     <td>";
                     echo firstDayOfWeek($week, $currYear);
+                    $currUser = $date_array[$week];
                     echo "
                     </td>
                     <td> 
-                        <select name='eplucheur".$week."'>"; 
-              
-                        $currUser = $date_array[$week];
+                        <select class=$currUser name='eplucheur".$week."'>";
+                        
                         echo "<option selected ='selected' value='personne' name='eplucheur".$week."'>personne</option>";
 
                         foreach ($users_array as $user){
