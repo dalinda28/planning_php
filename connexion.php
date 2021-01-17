@@ -34,9 +34,6 @@
             die();
         }
     }
-    if (isset($_POST["inscription"])){
-        require "inscription.php";
-    }
 
 ?>
 <html>
@@ -60,10 +57,12 @@
                 <input type="password" placeholder="Entrer le mot de passe" name="password" >
 
                 <input type="submit" id='submit' value='Se connecter'>
-                <input type="submit" id='submit' value="S'inscrire" name="inscription">
-
                 <?php echo "<span style= color:red >$res1</span><br/><br/>"; ?>
 
+            </form>
+            <form action="inscription.php" method="POST">
+                <h3>Pas de compte ?</h3>
+                <input type="submit" id='submit' value="S'inscrire" name="inscription">
             </form>
         </div>
     </body>
