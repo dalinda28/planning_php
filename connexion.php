@@ -1,10 +1,6 @@
 <?php
     session_start();
-     if (isset($_POST['username']) and isset($_POST['password'])){
-        // on applique les deux fonctions mysqli_real_escape_string et htmlspecialchars
-        // pour éliminer toute attaque de type injection SQL et XSS
-        $username = mysqli_real_escape_string($db,htmlspecialchars($_POST['username'])); 
-        $password = mysqli_real_escape_string($db,htmlspecialchars($_POST['password']));
+    if (isset($_POST['username']) and isset($_POST['password'])){
         $username=$_POST['username'];
         $password=$_POST['password'];
         
@@ -26,22 +22,16 @@
             $currUser=$user;
         }
 
-        if (!$userExist) {
-            $res1 = "Ce username n'existe pas";
+        if (!$userExist || !$password) {
+            $res1 = "Le username ou le mot de passe est incorrect";
         }  
 
         else {
-            $password_hashed = $currUser->password;
-            if (!password_verify($password, $password_hashed)) {
-                $res2 = "Mot de passe incorrect";
-            }
-            else {
-                $_SESSION["id"] = $currUser->_id;
-                $_SESSION["username"] = $currUser->username;     
+            $_SESSION["id"] = $currUser->_id;
+            $_SESSION["username"] = $currUser->username;     
 
-                header('Location: index.php');       
-                die();
-            }
+            header('Location: index.php');       
+            die();
         }
     }
 
@@ -62,13 +52,13 @@
 
                 <label><b>Nom d'utilisateur</b></label>
                 <input type="text" placeholder="Entrer le nom d'utilisateur" name="username" required>
-                <?php echo "<span>$res1</span><br>"; ?>
-
+                
                 <label><b>Mot de passe</b></label>
                 <input type="password" placeholder="Entrer le mot de passe" name="password" required>
-                <?php echo "<span>$res2</span>"; ?>
 
-                <input type="submit" id='submit' value='LOGIN'>
+                <input type="submit" id='submit' value='Se connecter'>
+                <?php echo "<span style= color:red >$res1</span><br/><br/>"; ?>
+
             </form>
         </div>
     </body>
