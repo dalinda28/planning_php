@@ -7,7 +7,7 @@
         // connexion à la base de données
         $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
         try {      
-            $filter = ['username' => $username, 'password' => $password];
+            $filter = ['username' => $username];
             $option = [];
             $read = new MongoDB\Driver\Query($filter, $option);
             $cursor = $manager->executeQuery('Planning.Users', $read);
@@ -17,21 +17,27 @@
             exit();
         }
    
+        $currUser=[];
         foreach ($cursor as $user) {
             $userExist = $user ? true : false;
             $currUser=$user;
         }
 
-        if (!$userExist || !$password) {
-            $res1 = "Le username ou le mot de passe est incorrect";
+        if (!$userExist) {
+            $res1 = "Ce username n'existe pas";
         }  
-
         else {
+            $password_hashed = $currUser->password;
+            if (!password_verify($password, $password_hashed)) {
+                $res1 = "Mot de passe incorrect";
+            }
+            else {
             $_SESSION["id"] = $currUser->_id;
             $_SESSION["username"] = $currUser->username;     
 
             header('Location: index.php');       
             die();
+            }
         }
     }
 

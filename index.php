@@ -192,9 +192,12 @@ if (isset($_POST["updateTable"])) {
             <h2>Statistiques par ordre croissant</h2>
             <?php
                 function statUser($user){
+
+                    global $year;  
+
                     $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
                     try {
-                        $filter = ["user" => $user];
+                        $filter = ["user" => $user, "year" => $year];
                         $option = [];
                         $read = new MongoDB\Driver\Query($filter, $option);
                         $cursor3 = $manager->executeQuery('Planning.Weeks', $read);
