@@ -1,5 +1,11 @@
 <?php 
+    // Initialiser la session
     session_start();
-    session_destroy();
-    header("location:connexion.php");
+    
+    // Détruire la session.
+    if(session_destroy())
+    {
+    // Redirection vers la page de connexion
+    header("Location: connexion.php");
+    }
 ?>
