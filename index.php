@@ -1,7 +1,10 @@
 <?php
-//session_start();
-if (isset($_SESSION['login'])) {
+session_start();
+// Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
+if (!isset($_SESSION['username'])) {
     header('Location: connexion.php');
+    exit(); 
+
 }
 
 //Database connection
@@ -46,6 +49,9 @@ if (isset($_POST["updateTable"])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" 
+        crossorigin="anonymous"> 
     <title>Planning MongoDB Mel & Dadou</title>
 </head>
 <style>
@@ -71,9 +77,15 @@ if (isset($_POST["updateTable"])) {
 }
 </style>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light row pl-5 pr-5">
+        <p class="col-11" >Bienvenue <strong><?php echo $_SESSION['username']; ?></strong> dans votre tableau de bord. !</p>
+        
+        <a type="button" class="btn btn-success col-1 p-2" href="deconnexion.php">Déconnexion</a>
+    </nav>
     <div class="container">
         <div>
             <h1 align="center">Planning des corvées d'épluchage</h1>
+
         </div>
         <form action="" name="form_year" method="post" align="center"> 
             <label for="year">Année :</label>
