@@ -1,11 +1,11 @@
 <?php
-session_start();
+//session_start();
 if (isset($_SESSION['login'])) {
     header('Location: connexion.php');
 }
 
 //Database connection
-$manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
+$manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');    
 
 //Si la page a été chargée après un changement d'année via le select: $currYear désigne l'année que le planning va afficher
 if (isset($_POST["isFormSend"])){
@@ -65,6 +65,9 @@ if (isset($_POST["updateTable"])) {
 }
 .Youssef {
 	background-color: #FFFF00;
+}
+.Patrick {
+	background-color: #FF3000;
 }
 </style>
 <body>
@@ -153,11 +156,6 @@ if (isset($_POST["updateTable"])) {
                     }
 
                     $week=0;
-                    // stats by user
-                    $statMelinna = 0;
-                    $statYoussef = 0;
-                    $statDalinda = 0;
-                    $statJean = 0;
                     //On construit le tableau (planning) avec ses cellules
                     for ($i = 1; $i <= 13; $i++) {
                         echo "
@@ -171,34 +169,13 @@ if (isset($_POST["updateTable"])) {
                             echo "</td>
                                 <td> 
                                 <select class=$currUser name='eplucheur".$week."'>";
-                                
-                                echo "<option selected ='selected' value='personne' name='eplucheur".$week."'>personne</option>";
-
-                                foreach ($users_array as $user){
+                                echo "<option selected ='selected' value='personne' name='eplucheur".$week."'>personne</option>";                                foreach ($users_array as $user){
                                     echo "<option ";
                                     if ($user == $currUser){
-                                        echo "selected ='selected'";
-                                        //pour les statistiques
-                                        switch ($user) {
-                                            case 'Melinna':
-                                                $statMelinna++;
-                                                $number = 1;
-                                                echo "class='user".$number."'";
-                                                break;
-                                            case 'Dalinda':
-                                                $statDalinda++;
-                                                $number = 2;
-                                                break;
-                                            case 'Jean':
-                                                $statJean++;
-                                                break;
-                                            case 'Youssef':
-                                                $statYoussef++;
-                                                break;
-                                        }
+                                        echo "selected ='selected' ";
                                     }
                                     echo "value='$user' name='eplucheur".$week."'>$user</option>";
-                                }
+                                }	                        
                             echo "</select> </td> ";
                         }
                         echo "</tr>";          
@@ -214,19 +191,27 @@ if (isset($_POST["updateTable"])) {
         <div>
             <h2>Statistiques par ordre croissant</h2>
             <?php
-                // stats ordering system
-                $usersStats = array(
-                    "Melinna" => $statMelinna,
-                    "Dalinda" => $statDalinda,
-                    "Jean" => $statJean,
-                    "Youssef" => $statYoussef
-                );
-                asort($usersStats);
-                echo "<ul>";
-                foreach($usersStats as $i=>$usersStat){
-                    echo "<li>".$i." : ".$usersStat."</li><br>";
+                function statUser($user){
+                    $manager = new MongoDB\Driver\Manager('mongodb+srv://Melinna_agdl:melinna@cluster0.rd11o.mongodb.net/test?authSource=admin&replicaSet=atlas-3vwaqm-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true');        
+                    try {
+                        $filter = ["user" => $user];
+                        $option = [];
+                        $read = new MongoDB\Driver\Query($filter, $option);
+                        $cursor3 = $manager->executeQuery('Planning.Weeks', $read);
+                    } 
+                    catch (MongoDB\Driver\Exception\Exception $e) {
+                        echo "Probleme! : " . $e->getMessage();
+                        exit();
+                    }
+                    return iterator_count($cursor3);
                 }
-                echo "</ul>"
+
+                
+                echo "<ol>";
+                foreach ($users_array as $user){
+                    echo "<li> ".$user." : ".statUser($user)." </li><br>";
+                }
+                echo "</ol>";
             ?>
         </div>
         
